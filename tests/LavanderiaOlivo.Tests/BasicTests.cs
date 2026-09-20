@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace LavanderiaOlivo.Tests;
 
 public class BasicTests
