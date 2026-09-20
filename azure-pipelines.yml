@@ -1,0 +1,31 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: Release
+
+steps:
+  - task: UseDotNet@2
+    displayName: Instalar .NET SDK 8
+    inputs:
+      packageType: sdk
+      version: 8.x
+
+  - script: |
+      for project in src/*/*.csproj; do
+        dotnet restore "$project"
+        dotnet build "$project" --configuration $(buildConfiguration) --no-restore
+      done
+    displayName: Restaurar y compilar microservicios
+
+  - script: dotnet test tests/LavanderiaOlivo.Tests/LavanderiaOlivo.Tests.csproj --configuration $(buildConfiguration) --collect:"XPlat Code Coverage"
+    displayName: Ejecutar pruebas automatizadas
+
+  - script: docker compose config
+    displayName: Validar Docker Compose
